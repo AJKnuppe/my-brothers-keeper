@@ -1,0 +1,704 @@
+
+
+CAR Paper
+
+Final Stata Code
+
+Including Appendix
+
+===============================
+
+Table 1: Experimental Vignettes
+
+===============================
+
+/ text from experiments / 
+
+
+
+==============================================
+
+Figure 1: Evidence of Brother's Keeper Effects
+
+==============================================
+
+
+graph bar peacekeepers2 troops2 dosomething if pass1==1, over(assign2, relabel(1 "Control" 2 "Christians Killed")) blabel(bar, format(%9.2f)) ytitle("") bar(1, color(ebblue)) bar(2, color(green)) bar(3, color(maroon))  ylabel(0(.1).55) legend(label(1 "Peacekeepers") label(2 "Troops") label(3 "Do Something") row(1))  note("n: Control=336, Christians Killed=317") title("Figure 1: Greater Support for Intervention when Christians Targeted", size(medium)) saving(f1, replace) 
+
+ttest peacekeepers2 if pass1==1, by(assign2)
+ttest troops2 if pass1==1, by(assign2)
+ttest dosomething if pass1==1, by(assign2)
+
+
+=========================================================
+
+Table 2: Statistical Evidence of Brother's Keeper Effects
+
+=========================================================
+
+logit peacekeepers2 assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+logit troops2 assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+logit dosomething assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+
+
+===============================================================
+
+Figure 2: Brother's Keeper Effects Greater Among More Religious
+
+===============================================================
+
+
+rh/rl: high religious, low religious
+
+gen peacekeepersrl=peacekeepers2 if religiosityd==0
+gen peacekeepersrh=peacekeepers2 if religiosityd==1
+gen troopsrl=troops2 if religiosityd==0
+gen troopsrh=troops2 if religiosityd==1
+gen dosomethingrl=dosomething if religiosityd==0
+gen dosomethingrh=dosomething if religiosityd==1
+
+
+tab religiosityd if assign2!=. & pass1==1
+
+
+graph bar peacekeepersrl peacekeepersrh if pass1==1, over(assign2) bar(1, color(blue)) bar(2, color(dknavy)) legend(label(1 "Low") label(2 "High") row(1) size(small)) blabel(bar, format(%9.2f)) title(Peacekeepers) ylabel(0(.1).63) ytitle(" ") saving(f2a, replace)
+
+graph bar troopsrl troopsrh if pass1==1, over(assign2) bar(1, color(green)) bar(2, color(emerald)) legend(label(1 "Low") label(2 "High") row(1) size(small)) ytitle(" ") blabel(bar, format(%9.2f)) title(Troops) ylabel(0(.1).63)  saving(f2b, replace)
+
+graph bar dosomethingrl dosomethingrh if pass1==1, over(assign2) bar(1, color(sienna)) bar(2, color(cranberry)) legend(label(1 "Low") label(2 "High") row(1) size(small)) ytitle(" ") blabel(bar, format(%9.2f)) title(Do Something) ylabel(0(.1).63)   saving(f2c, replace)
+
+
+gr combine "f2a" "f2b" "f2c", row(1) title(Figure 2: Brother's Keeper Effects Greater Among More Religious) imargins(.2 .2 .2 .2) note("n: Low Religiosity=386, High Religiosity=267") saving(f2, replace)
+
+
+ttest peacekeepersrl if pass1==1, by(assign2)
+ttest troopsrl if pass1==1, by(assign2)
+ttest dosomethingrl if pass1==1, by(assign2)
+
+
+ttest peacekeepersrh if pass1==1, by(assign2)
+ttest troopsrh if pass1==1, by(assign2)
+ttest dosomethingrh if pass1==1, by(assign2)
+
+ttest peacekeepersrl=peacekeepersrh if assign2==0 & pass1==1, unp
+ttest troopsrl=troopsrh if assign2==0 & pass1==1, unp
+ttest dosomethingrl=dosomethingrh if assign2==0 & pass1==1, unp
+
+ttest peacekeepersrl=peacekeepersrh if assign2==1 & pass1==1, unp
+ttest troopsrl=troopsrh if assign2==1 & pass1==1, unp
+ttest dosomethingrl=dosomethingrh if assign2==1 & pass1==1, unp
+
+
+
+======================================================================================
+
+Table 3: Statistical Evidence of Greater Brother's Keeper Effects Among More Religious
+
+======================================================================================
+
+/Religiosity/
+logit peacekeepers2 assign2##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign2@religiosityd
+margins, dydx(*)
+
+logit troops2 assign2##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign2@religiosityd
+margins, dydx(*)
+
+logit dosomething assign2##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign2@religiosityd
+margins, dydx(*)
+
+
+
+===============================================================
+
+Table 4: Brother's Keeper Effects Stronger as Population Effect
+
+===============================================================
+
+/ There were concerns about how representative our data is
+/ So we weigh the data to be Census Rep AND religiously representative
+	
+
+
+// Gender //
+male: female, male
+50.8 49.2
+
+// race //
+race: white, black, native American, Asian, Other
+74 12.6 .8 4.9 7.7
+
+// age //
+gen age2=.
+replace age2=1 if age<25
+replace age2=2 if age>24 & age<45
+replace age2=3 if age>44 & age<60
+replace age2=4 if age>59
+17.50 32.98 25.83 23.69
+
+// education //
+gen educ=d14
+
+
+What is the highest level of education you have obtained?
+	Not graduated high school  (1)
+	High school or equivalent  (2)
+	Associate’s degree  (3)
+	Bachelor’s degree  (4)
+	Postgraduate degree (5)
+13.90 28.10 29.00 18.00 10.80
+
+/// religion ///
+.data from Pew Religious Landscape Study (http://www.pewforum.org/religious-landscape-study/)
+relid
+	Protestant (1)
+	Catholic (2)
+	Evangelical Christian (3)
+	Latter Day Saint (4)
+	Jewish (5)
+	Muslim (6)
+	Hindu (7)
+	None (Atheist, Agnostic, Humanist) (8)
+	Other non-Christian (9)
+
+21.2 20.8 25.4 1.6 1.9 .9 .7 22.8 4.7
+
+// Combining categories //
+relid2
+1: Protestant
+2: Catholic
+3: Evangelical
+4: None
+5: Other
+
+gen relid2=.
+replace relid2=1 if relid==1
+replace relid2=2 if relid==2
+replace relid2=3 if relid==3
+replace relid2=5 if relid==4
+replace relid2=5 if relid==5
+replace relid2=5 if relid==6
+replace relid2=5 if relid==7
+replace relid2=4 if relid==8
+replace relid2=5 if relid==9
+
+
+
+ipfweight male race age2 educ relid2 if assign!=3, gen(wgt) val(50.8 49.2 74 12.6 .8 4.9 7.7 17.50 32.98 25.83 23.69 13.90 28.10 29.00 18.00 10.80 21.2 20.8 25.4 22.8 9.8) maxiter(50) up(5)
+
+/biggest deviation (from Census rep): Old respondents (% too low), No HS respondents (% too low)
+
+
+
+
+.Using 5 point DV (instead of dichotomous)
+.Using Census Weights
+
+//
+
+ttest peacekeepers2 if pass1==1, by(assign2)
+ttest troops2 if pass1==1, by(assign2)
+ttest dosomething if pass1==1, by(assign2)
+
+logit peacekeepers2 assign2 if pass1==1
+logit troops2 assign2 if pass1==1
+logit dosomething assign2 if pass1==1
+
+//
+
+/DV: 5 point
+ttest peacekeepers1 if pass1==1, by(assign2)
+ttest unilateral1 if pass1==1, by(assign2)
+ttest dosomething2 if pass1==1, by(assign2)
+
+
+//Dichtomous DV, Census 
+
+svyset [pweight=wgt]
+
+svy: mean peacekeepers2 if pass1==1, over(assign2)
+svy: logit peacekeepers2 assign2 if pass1==1
+margins, dydx(*)
+
+svy: mean troops2 if pass1==1, over(assign2)
+svy: logit troops2 assign2 if pass1==1
+margins, dydx(*)
+
+svy: mean dosomething if pass1==1, over(assign2)
+svy: logit dosomething assign2 if pass1==1
+margins, dydx(*)
+
+//5-point DV, Census 
+gen dosomething2=peacekeepers1+unilateral1
+
+svyset [pweight=wgt]
+
+svy: mean peacekeepers1 if pass1==1, over(assign2)
+svy: ologit peacekeepers1 assign2 if pass1==1
+margins, dydx(*)
+
+svy: mean unilateral1 if pass1==1, over(assign2)
+svy: ologit unilateral1 assign2 if pass1==1
+margins, dydx(*)
+
+svy: mean dosomething2 if pass1==1, over(assign2)
+svy: ologit dosomething2 assign2 if pass1==1
+margins, dydx(*)
+
+
+
+
+========
+
+Figure 3
+
+========
+
+tab assign3 if pass1==1
+
+graph bar peacekeepers2 troops2 dosomething if pass1==1, over(assign3) blabel(bar, format(%9.2f)) ytitle("") bar(1, color(ebblue)) bar(2, color(green)) bar(3, color(maroon))  ylabel(0(.1).55) legend(label(1 "Peacekeepers") label(2 "Troops") label(3 "Do Something") row(1))  note("n: Christian victims=317, Christian & Muslim victims=309") title("Figure 3: Not My Brother Effects") saving(f3, replace) 
+
+
+ttest peacekeepers2 if pass1==1, by(assign3)
+ttest troops2 if pass1==1, by(assign3)
+ttest dosomething if pass1==1, by(assign3)
+
+
+
+=======
+
+Table 5
+
+=======
+
+
+logit peacekeepers2 assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+logit troops2 assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+logit dosomething assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins, dydx(*)
+
+
+
+========
+
+Figure 4
+
+========
+
+
+tab religiosityd if assign3!=. & pass1==1
+
+graph bar peacekeepersrl peacekeepersrh if pass1==1, over(assign3, relabel(1 "1" 2 "2")) bar(1, color(blue)) bar(2, color(dknavy)) legend(label(1 "Low") label(2 "High") row(1) size(small)) blabel(bar, format(%9.2f)) title(Peacekeepers) ylabel(0(.1).63) ytitle("") saving(f4a, replace)
+
+graph bar troopsrl troopsrh if pass1==1, over(assign3, relabel(1 "1" 2 "2")) bar(1, color(green)) bar(2, color(emerald)) legend(label(1 "Low") label(2 "High") row(1) size(small)) ytitle(" ") blabel(bar, format(%9.2f)) title(Troops)  ylabel(0(.1).63) saving(f4b, replace)
+
+graph bar dosomethingrl dosomethingrh if pass1==1, over(assign3, relabel(1 "1" 2 "2")) bar(1, color(sienna)) bar(2, color(cranberry)) legend(label(1 "Low") label(2 "High") row(1) size(small)) ytitle(" ") blabel(bar, format(%9.2f)) title(Do Something)  ylabel(0(.1).63) saving(f4c, replace)
+
+gr combine "f5a" "f5b" "f5c", row(1) title(Figure 4: Not My Brother Effects by Religiosity) imargins(.2 .2 .2 .2) note("Treatment Group: 1=Christians Killed, 2: Christians and Muslims Killed" "n:Low Religiosity=365, High Religiosity=261") saving(f4, replace)
+
+
+ttest peacekeepersrl if pass1==1, by(assign3)
+ttest troopsrl if pass1==1, by(assign3)
+ttest dosomethingrl if pass1==1, by(assign3)
+
+ttest peacekeepersrh if pass1==1, by(assign3)
+ttest troopsrh if pass1==1, by(assign3)
+ttest dosomethingrh if pass1==1, by(assign3)
+
+ttest peacekeepersrl=peacekeepersrh if assign3==0 & pass1==1, unp
+ttest troopsrl=troopsrh if assign3==0 & pass1==1, unp
+ttest dosomethingrl=dosomethingrh if assign3==0 & pass1==1, unp
+
+ttest peacekeepersrl=peacekeepersrh if assign3==1 & pass1==1, unp
+ttest troopsrl=troopsrh if assign3==1 & pass1==1, unp
+ttest dosomethingrl=dosomethingrh if assign3==1 & pass1==1, unp
+
+
+
+///
+
+///
+
+
+
+
+###Take out perceptions of religiosity
+
+
+=======
+
+Table 6
+
+=======
+
+logit peacekeepers2 assign3##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign3@religiosityd
+margins, dydx(*)
+
+logit troops2 assign3##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign3@religiosityd
+margins, dydx(*)
+
+logit dosomething assign3##religiosityd follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+margins r.assign3@religiosityd
+margins, dydx(*)
+
+=======
+
+Table 7
+
+=======
+
+ttest peacekeepers2 if pass1==1, by(assign3)
+ttest troops2 if pass1==1, by(assign3)
+ttest dosomething if pass1==1, by(assign3)
+
+
+/Dichtomous DV, Census 
+
+svyset [pweight=wgt]
+
+svy: mean peacekeepers2 if pass1==1, over(assign3)
+svy: logit peacekeepers2 assign3 if pass1==1
+margins, dydx(*)
+
+svy: mean troops2 if pass1==1, over(assign3)
+svy: logit troops2 assign3 if pass1==1
+margins, dydx(*)
+
+svy: mean dosomething if pass1==1, over(assign3)
+svy: logit dosomething assign3 if pass1==1
+margins, dydx(*)
+
+
+
+
+
+
+
+========
+APPENDIX
+========
+
+
+
+==================================================================================
+
+Table A1: Brother's Keeper Treatment Effects Robust Across Multiple Specifications
+
+==================================================================================
+
+ologit peacekeepers1 assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+ologit unilateral1 assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+reg dosomething2 assign2 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+
+
+
+=============================================================================
+
+Table A2: Brother's Keepers Effects Stronger Among More Religious Respondents									
+
+=============================================================================
+
+
+
+///// Religiosity /////
+. In the paper, we split up religiosity as 2 levels (above/below mean)
+. Here, I check robustness if expanding religiosity categories
+
+tab religiosity if assign2!=. & pass1==1
+
+
+// 3 levels of religiosity //
+gen r3=.
+replace r3=1 if religiosity>3 & religiosity<6
+replace r3=2 if religiosity>5 & religiosity<10
+replace r3=3 if religiosity>9 & religiosity<21
+
+
+/Effects/
+ttest peacekeepers2 if r3==1 & pass1==1 & assign2==0 | r3==1 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if r3==2 & pass1==1 & assign2==0 | r3==2 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if r3==3 & pass1==1 & assign2==0 | r3==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest troops2 if r3==1 & pass1==1 & assign2==0 | r3==1 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if r3==2 & pass1==1 & assign2==0 | r3==2 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if r3==3 & pass1==1 & assign2==0 | r3==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest dosomething if r3==1 & pass1==1 & assign2==0 | r3==1 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if r3==2 & pass1==1 & assign2==0 | r3==2 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if r3==3 & pass1==1 & assign2==0 | r3==3 & pass1==1 & assign2==1, by(assign2) 
+
+
+///// Religion Important /////
+.3 levels: Not Important (1), Some importance (2,3), Very Important (4,5)
+
+gen relimportant2b=.
+replace relimportant2b=1 if relimportant2==1
+replace relimportant2b=2 if relimportant2==2
+replace relimportant2b=2 if relimportant2==3
+replace relimportant2b=3 if relimportant2==4
+replace relimportant2b=3 if relimportant2==5
+
+
+/Effects/
+ttest peacekeepers2 if relimportant2b==1 & pass1==1 & assign2==0 | relimportant2b==1 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relimportant2b==2 & pass1==1 & assign2==0 | relimportant2b==2 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relimportant2b==3 & pass1==1 & assign2==0 | relimportant2b==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest troops2 if relimportant2b==1 & pass1==1 & assign2==0 | relimportant2b==1 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relimportant2b==2 & pass1==1 & assign2==0 | relimportant2b==2 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relimportant2b==3 & pass1==1 & assign2==0 | relimportant2b==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest dosomething if relimportant2b==1 & pass1==1 & assign2==0 | relimportant2b==1 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relimportant2b==2 & pass1==1 & assign2==0 | relimportant2b==2 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relimportant2b==3 & pass1==1 & assign2==0 | relimportant2b==3 & pass1==1 & assign2==1, by(assign2) 
+
+///// Church Attendance ////
+.3 levels: Never (1), Infrequent (2,3), Frequent (4,5)
+
+gen relattend2=.
+replace relattend2=1 if relattend==1
+replace relattend2=2 if relattend==2
+replace relattend2=2 if relattend==3
+replace relattend2=3 if relattend==4
+replace relattend2=3 if relattend==5
+
+/Effects/
+ttest peacekeepers2 if relattend2==1 & pass1==1 & assign2==0 | relattend2==1 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relattend2==2 & pass1==1 & assign2==0 | relattend2==2 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relattend2==3 & pass1==1 & assign2==0 | relattend2==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest troops2 if relattend2==1 & pass1==1 & assign2==0 | relattend2==1 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relattend2==2 & pass1==1 & assign2==0 | relattend2==2 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relattend2==3 & pass1==1 & assign2==0 | relattend2==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest dosomething if relattend2==1 & pass1==1 & assign2==0 | relattend2==1 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relattend2==2 & pass1==1 & assign2==0 | relattend2==2 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relattend2==3 & pass1==1 & assign2==0 | relattend2==3 & pass1==1 & assign2==1, by(assign2) 
+
+
+
+///// Religion not divisive /////
+.3 levels: Religion is divisive (1), Unsure (2,3), Religion is not divisive (4,5)
+
+gen relndiv2=.
+replace relndiv2=1 if relndiv==1
+replace relndiv2=2 if relndiv==2
+replace relndiv2=2 if relndiv==3
+replace relndiv2=3 if relndiv==4
+replace relndiv2=3 if relndiv==5
+
+/Effects/
+ttest peacekeepers2 if relndiv2==1 & pass1==1 & assign2==0 | relndiv2==1 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relndiv2==2 & pass1==1 & assign2==0 | relndiv2==2 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relndiv2==3 & pass1==1 & assign2==0 | relndiv2==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest troops2 if relndiv2==1 & pass1==1 & assign2==0 | relndiv2==1 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relndiv2==2 & pass1==1 & assign2==0 | relndiv2==2 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relndiv2==3 & pass1==1 & assign2==0 | relndiv2==3 & pass1==1 & assign2==1, by(assign2) 
+
+ttest dosomething if relndiv2==1 & pass1==1 & assign2==0 | relndiv2==1 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relndiv2==2 & pass1==1 & assign2==0 | relndiv2==2 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relndiv2==3 & pass1==1 & assign2==0 | relndiv2==3 & pass1==1 & assign2==1, by(assign2) 
+
+
+
+///// By Denomination /////
+relid2
+1: Protestant
+2: Catholic
+3: Evangelical
+4: None
+5: Other
+
+
+/Effects/
+ttest peacekeepers2 if relid2==1 & pass1==1 & assign2==0 | relid2==1 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relid2==2 & pass1==1 & assign2==0 | relid2==2 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relid2==3 & pass1==1 & assign2==0 | relid2==3 & pass1==1 & assign2==1, by(assign2) 
+ttest peacekeepers2 if relid2==4 & pass1==1 & assign2==0 | relid2==4 & pass1==1 & assign2==1, by(assign2)
+ttest peacekeepers2 if relid2==5 & pass1==1 & assign2==0 | relid2==5 & pass1==1 & assign2==1, by(assign2)
+
+ttest troops2 if relid2==1 & pass1==1 & assign2==0 | relid2==1 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relid2==2 & pass1==1 & assign2==0 | relid2==2 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relid2==3 & pass1==1 & assign2==0 | relid2==3 & pass1==1 & assign2==1, by(assign2) 
+ttest troops2 if relid2==4 & pass1==1 & assign2==0 | relid2==4 & pass1==1 & assign2==1, by(assign2)
+ttest troops2 if relid2==5 & pass1==1 & assign2==0 | relid2==5 & pass1==1 & assign2==1, by(assign2)
+
+ttest dosomething if relid2==1 & pass1==1 & assign2==0 | relid2==1 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relid2==2 & pass1==1 & assign2==0 | relid2==2 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relid2==3 & pass1==1 & assign2==0 | relid2==3 & pass1==1 & assign2==1, by(assign2) 
+ttest dosomething if relid2==4 & pass1==1 & assign2==0 | relid2==4 & pass1==1 & assign2==1, by(assign2)
+ttest dosomething if relid2==5 & pass1==1 & assign2==0 | relid2==5 & pass1==1 & assign2==1, by(assign2)
+
+
+
+===========================================================
+
+Table A3: Demographics of Mturk Sample and Weighted Samples
+
+===========================================================
+
+/mturk/
+tab male if assign!=3
+tab race if assign!=3
+tab age2 if assign!=3
+tab educ if assign!=3
+tab relid2 if assign!=3
+
+/weighted data/
+svyset [pweight=wgt]
+
+svy: tab male if assign!=3
+svy: tab race if assign!=3
+svy: tab age2 if assign!=3
+svy: tab educ if assign!=3
+svy: tab relid2 if assign!=3
+
+
+
+
+=========================================================================================
+
+Table A4: Not My Brother's Keeper Effects Not Statistically Significant Across Multiple Specifications
+
+=========================================================================================
+
+ologit peacekeepers1 assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+ologit unilateral1 assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+reg dosomething2 assign3 follow0 responsible0 interests0 followfp mil intl superior rep dem male white educ veteran if pass1==1
+
+
+
+====================================================================================
+
+Table A5: Not My Brother's Keepers Effects Stronger Among More Religious Respondents
+
+====================================================================================
+
+
+// 3 levels of religiosity //
+
+/Effects/
+ttest peacekeepers2 if r3==1 & pass1==1 & assign3==0 | r3==1 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if r3==2 & pass1==1 & assign3==0 | r3==2 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if r3==3 & pass1==1 & assign3==0 | r3==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest troops2 if r3==1 & pass1==1 & assign3==0 | r3==1 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if r3==2 & pass1==1 & assign3==0 | r3==2 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if r3==3 & pass1==1 & assign3==0 | r3==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest dosomething if r3==1 & pass1==1 & assign3==0 | r3==1 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if r3==2 & pass1==1 & assign3==0 | r3==2 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if r3==3 & pass1==1 & assign3==0 | r3==3 & pass1==1 & assign3==1, by(assign3) 
+
+///// Religion Important /////
+.3 levels: Not Important (1), Some importance (2,3), Very Important (4,5)
+
+gen relimportant2b=.
+replace relimportant2b=1 if relimportant2==1
+replace relimportant2b=2 if relimportant2==2
+replace relimportant2b=2 if relimportant2==3
+replace relimportant2b=3 if relimportant2==4
+replace relimportant2b=3 if relimportant2==5
+
+
+/Effects/
+ttest peacekeepers2 if relimportant2b==1 & pass1==1 & assign3==0 | relimportant2b==1 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relimportant2b==2 & pass1==1 & assign3==0 | relimportant2b==2 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relimportant2b==3 & pass1==1 & assign3==0 | relimportant2b==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest troops2 if relimportant2b==1 & pass1==1 & assign3==0 | relimportant2b==1 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relimportant2b==2 & pass1==1 & assign3==0 | relimportant2b==2 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relimportant2b==3 & pass1==1 & assign3==0 | relimportant2b==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest dosomething if relimportant2b==1 & pass1==1 & assign3==0 | relimportant2b==1 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relimportant2b==2 & pass1==1 & assign3==0 | relimportant2b==2 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relimportant2b==3 & pass1==1 & assign3==0 | relimportant2b==3 & pass1==1 & assign3==1, by(assign3) 
+
+
+
+
+
+///// Church Attendance ////
+.3 levels: Never (1), Infrequent (2,3), Frequent (4,5)
+
+/Effects/
+ttest peacekeepers2 if relattend2==1 & pass1==1 & assign3==0 | relattend2==1 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relattend2==2 & pass1==1 & assign3==0 | relattend2==2 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relattend2==3 & pass1==1 & assign3==0 | relattend2==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest troops2 if relattend2==1 & pass1==1 & assign3==0 | relattend2==1 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relattend2==2 & pass1==1 & assign3==0 | relattend2==2 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relattend2==3 & pass1==1 & assign3==0 | relattend2==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest dosomething if relattend2==1 & pass1==1 & assign3==0 | relattend2==1 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relattend2==2 & pass1==1 & assign3==0 | relattend2==2 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relattend2==3 & pass1==1 & assign3==0 | relattend2==3 & pass1==1 & assign3==1, by(assign3) 
+
+
+
+///// Religion not divisive /////
+.3 levels: Religion is divisive (1), Unsure (2,3), Religion is not divisive (4,5)
+
+/Effects/
+ttest peacekeepers2 if relndiv2==1 & pass1==1 & assign3==0 | relndiv2==1 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relndiv2==2 & pass1==1 & assign3==0 | relndiv2==2 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relndiv2==3 & pass1==1 & assign3==0 | relndiv2==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest troops2 if relndiv2==1 & pass1==1 & assign3==0 | relndiv2==1 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relndiv2==2 & pass1==1 & assign3==0 | relndiv2==2 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relndiv2==3 & pass1==1 & assign3==0 | relndiv2==3 & pass1==1 & assign3==1, by(assign3) 
+
+ttest dosomething if relndiv2==1 & pass1==1 & assign3==0 | relndiv2==1 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relndiv2==2 & pass1==1 & assign3==0 | relndiv2==2 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relndiv2==3 & pass1==1 & assign3==0 | relndiv2==3 & pass1==1 & assign3==1, by(assign3) 
+
+
+///// By Denomination /////
+relid2
+1: Protestant
+2: Catholic
+3: Evangelical
+4: None
+5: Other
+
+
+/Effects/
+ttest peacekeepers2 if relid2==1 & pass1==1 & assign3==0 | relid2==1 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relid2==2 & pass1==1 & assign3==0 | relid2==2 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relid2==3 & pass1==1 & assign3==0 | relid2==3 & pass1==1 & assign3==1, by(assign3) 
+ttest peacekeepers2 if relid2==4 & pass1==1 & assign3==0 | relid2==4 & pass1==1 & assign3==1, by(assign3)
+ttest peacekeepers2 if relid2==5 & pass1==1 & assign3==0 | relid2==5 & pass1==1 & assign3==1, by(assign3)
+
+ttest troops2 if relid2==1 & pass1==1 & assign3==0 | relid2==1 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relid2==2 & pass1==1 & assign3==0 | relid2==2 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relid2==3 & pass1==1 & assign3==0 | relid2==3 & pass1==1 & assign3==1, by(assign3) 
+ttest troops2 if relid2==4 & pass1==1 & assign3==0 | relid2==4 & pass1==1 & assign3==1, by(assign3)
+ttest troops2 if relid2==5 & pass1==1 & assign3==0 | relid2==5 & pass1==1 & assign3==1, by(assign3)
+
+ttest dosomething if relid2==1 & pass1==1 & assign3==0 | relid2==1 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relid2==2 & pass1==1 & assign3==0 | relid2==2 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relid2==3 & pass1==1 & assign3==0 | relid2==3 & pass1==1 & assign3==1, by(assign3) 
+ttest dosomething if relid2==4 & pass1==1 & assign3==0 | relid2==4 & pass1==1 & assign3==1, by(assign3)
+ttest dosomething if relid2==5 & pass1==1 & assign3==0 | relid2==5 & pass1==1 & assign3==1, by(assign3)
+
+
